@@ -2,7 +2,7 @@ const fs = require('fs');
 const readline = require('readline')
 
 fuelRequired = (mass) => Math.floor(Number(mass) / 3) - 2
-fuelRequiredP2 = (mass, accum = 0, idx = 0) => {
+fuelRequiredP2 = (mass, accum = 0) => {
     const fuelForMass = fuelRequired(mass);
 
     if (fuelForMass <= 0) {
@@ -11,7 +11,7 @@ fuelRequiredP2 = (mass, accum = 0, idx = 0) => {
 
     accum += fuelForMass;
 
-    return fuelRequiredP2(fuelForMass, accum, ++idx);
+    return fuelRequiredP2(fuelForMass, accum);
 }
 
 //Tests p1
