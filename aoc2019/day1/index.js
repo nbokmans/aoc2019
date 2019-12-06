@@ -1,5 +1,4 @@
-const fs = require('fs');
-const readline = require('readline')
+const { readFile } = require('../util/filereader');
 
 fuelRequired = (mass) => Math.floor(Number(mass) / 3) - 2
 fuelRequiredP2 = (mass, accum = 0) => {
@@ -26,23 +25,11 @@ console.log(fuelRequiredP2(14))
 console.log(fuelRequiredP2(1969))
 console.log(fuelRequiredP2(100756))
 
-let sum = 0;
-let sumP2 = 0;
+readFile('input.txt', str => {
+    const masses = str.split('\n').slice(1);
+    const p1 = masses.reduce((total, mass) => total += fuelRequired(mass), 0);
+    const p2 = masses.reduce((total, mass) => total += fuelRequiredP2(mass), 0);
 
-const fileStream = fs.createReadStream('input.txt');
-
-const rl = readline.createInterface({
-    input: fileStream,
-    crlfDelay: Infinity
+    console.log(p1);
+    console.log(p2);
 });
-
-rl.on('line', (line) => {
-    sum += fuelRequired(line);
-    sumP2 += fuelRequiredP2(line);
-});
-
-
-rl.on('close', () => {
-    console.log(`P1: ${sum}`);
-    console.log(`P2: ${sumP2}`)
-})
