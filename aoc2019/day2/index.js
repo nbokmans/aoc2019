@@ -22,6 +22,34 @@ rl.on('line', (line) => {
     ];
 });
 
+const applyInstruction = (values, instruction) => {
+    const opcode = instruction[0];
+
+    if (opcode == OP_HALT
+        || opcode == null) {
+        return values;
+    }
+
+    const pos1 = instruction[1];
+    const pos2 = instruction[2];
+    const targetPos = instruction[3];
+
+    opcode === Opcode.ADD
+        ? values[targetPos] = values[pos1] + values[pos2]
+        : values[targetPos] = values[pos1] * values[pos2];
+
+    return values;
+}
+
+const applyProgram = (values) => {
+    for (let i = 0; i <= values.length; i += 4) {
+        const instruction = values.slice(i, i + 4);
+        applyInstruction(values, instruction);
+    }
+
+    return values;
+}
+
 const p2 = (values) => {
     for (let noun = 0; noun <= 99; noun++) {
         for (let verb = 0; verb <= 99; verb++) {
@@ -29,67 +57,18 @@ const p2 = (values) => {
             newValues[1] = noun;
             newValues[2] = verb;
 
-            for (let i = 0; i <= newValues.length; i += 4) {
-                const currentOperationInstructions = newValues.slice(i, i + 4);
+            const result = applyProgram(newValues);
 
-                const opcode = currentOperationInstructions[0];
-
-                if (opcode == OP_HALT
-                    || opcode == null) {
-                    break;
-                }
-
-                const pos1 = currentOperationInstructions[1];
-                const pos2 = currentOperationInstructions[2];
-                const targetPos = currentOperationInstructions[3];
-
-                const mutate = (opcode, pos1, pos2, targetPos) =>
-                    opcode === Opcode.ADD
-                        ? newValues[targetPos] = newValues[pos1] + newValues[pos2]
-                        : newValues[targetPos] = newValues[pos1] * newValues[pos2];
-
-                mutate(opcode, pos1, pos2, targetPos);
-            }
-
-            if (newValues[0] === 19690720) {
-                console.log(`noun:${noun},verb:${verb}`)
-                break;
+            if (result[0] === 19690720) {
+                return `${noun}${verb}`
             }
         }
     }
 
-
-
-    return [];
+    throw 'p2 solution not found';
 }
 
-const p1 = (values) => {
-    let newValues = [...values];
-
-    for (let i = 0; i <= newValues.length; i += 4) {
-        const currentOperationInstructions = newValues.slice(i, i + 4);
-
-        const opcode = currentOperationInstructions[0];
-
-        if (opcode == OP_HALT
-            || opcode == null) {
-            break;
-        }
-
-        const pos1 = currentOperationInstructions[1];
-        const pos2 = currentOperationInstructions[2];
-        const targetPos = currentOperationInstructions[3];
-
-        const mutate = (opcode, pos1, pos2, targetPos) =>
-            opcode === Opcode.ADD
-                ? newValues[targetPos] = newValues[pos1] + newValues[pos2]
-                : newValues[targetPos] = newValues[pos1] * newValues[pos2];
-
-        mutate(opcode, pos1, pos2, targetPos);
-    }
-
-    return newValues;
-}
+const p1 = (values) => applyProgram([...values]);
 
 rl.on('close', () => {
     /* Part 1 */
@@ -104,7 +83,7 @@ rl.on('close', () => {
 
     values[1] = 12;
     values[2] = 2;
-    console.log(p1(values));
+    console.log(p1(values)[0]);
     /* Part 2 */
     console.log(p2(values));
 
