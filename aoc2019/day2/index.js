@@ -1,54 +1,32 @@
-const fs = require('fs');
-const readline = require('readline');
-const fileStream = fs.createReadStream('input.txt');
-const rl = readline.createInterface({
-    input: fileStream,
-    crlfDelay: Infinity
-});
-
-const OP_HALT = 99;
+const { readFile } = require('../util/filereader');
 
 const Opcode = {
     ADD: 1,
-    MULTIPLY: 2
-}
-
-let values = [];
-
-rl.on('line', (line) => {
-    values = [
-        ...values,
-        ...line.split(',').map(Number)
-    ];
-});
-
-const applyInstruction = (values, instruction) => {
-    const opcode = instruction[0];
-
-    if (opcode == OP_HALT
-        || opcode == null) {
-        return values;
-    }
-
-    const pos1 = instruction[1];
-    const pos2 = instruction[2];
-    const targetPos = instruction[3];
-
-    opcode === Opcode.ADD
-        ? values[targetPos] = values[pos1] + values[pos2]
-        : values[targetPos] = values[pos1] * values[pos2];
-
-    return values;
+    MULTIPLY: 2,
+    HALT: 99
 }
 
 const applyProgram = (values) => {
     for (let i = 0; i <= values.length; i += 4) {
-        const instruction = values.slice(i, i + 4);
-        applyInstruction(values, instruction);
+        const [opcode, pos1, pos2, targetPos] = values.slice(i, i + 4);
+
+        switch (opcode) {
+            case Opcode.ADD:
+                values[targetPos] = values[pos1] + values[pos2]
+                break;
+            case Opcode.MULTIPLY:
+                values[targetPos] = values[pos1] * values[pos2]
+                break;
+            case Opcode.HALT:
+            default:
+                break;
+        }
     }
 
     return values;
 }
+
+const p1 = (values) => applyProgram([...values]);
 
 const p2 = (values) => {
     for (let noun = 0; noun <= 99; noun++) {
@@ -68,23 +46,9 @@ const p2 = (values) => {
     throw 'p2 solution not found';
 }
 
-const p1 = (values) => applyProgram([...values]);
-
-rl.on('close', () => {
-    /* Part 1 */
-    console.log(p1([1, 0, 0, 0, 99]));
-    console.log(p1([2, 3, 0, 3, 99]));
-    console.log(p1([2, 4, 4, 5, 99, 0]));
-    console.log(p1([1, 1, 1, 4, 99, 5, 6, 0, 99]));
-    console.log(p1([1, 9, 10, 3,
-        2, 3, 11, 0,
-        99,
-        30, 40, 50]))
-
-    values[1] = 12;
-    values[2] = 2;
+readFile('input.txt', (str) => {
+    const values = str.split(',').map(Number);
+    console.log(values);
     console.log(p1(values)[0]);
-    /* Part 2 */
     console.log(p2(values));
-
 });
