@@ -26,7 +26,13 @@ const applyProgram = (values) => {
     return values;
 }
 
-const p1 = (values) => applyProgram([...values]);
+const p1 = (values) => {
+    let newValues = [...values];
+    newValues[1] = 12;
+    newValues[2] = 2;
+
+    return applyProgram(newValues);
+};
 
 const p2 = (values) => {
     for (let noun = 0; noun <= 99; noun++) {
